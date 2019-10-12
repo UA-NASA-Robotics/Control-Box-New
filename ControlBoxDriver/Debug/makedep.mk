@@ -26,11 +26,21 @@ high_level_io\output_handler.cpp
 
 i2c\i2c.cpp
 
+i2c\I2CIO.cpp
+
+i2c\LCD.cpp
+
+i2c\LiquidCrystal_I2C.cpp
+
+i2c\SevenSegment.cpp
+
 main.cpp
 
 memory\memory.cpp
 
 screen\touch_screen.cpp
+
+timer\Clock.cpp
 
 timer\SimpleTimer0.cpp
 

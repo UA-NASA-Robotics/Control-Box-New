@@ -8,6 +8,7 @@
 #define Winbutton0       0x0600
 #define Winbutton1       0x0601
 #define Form1            0x0A01
+#define LEDDigits    0x0F00
 #define Image1           0x0C01
 #define Winbutton4       0x0604
 #define Statictext0      0x1500

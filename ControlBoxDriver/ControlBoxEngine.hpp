@@ -5,18 +5,19 @@
 #include "communications/communications.hpp"
 #include "high_level_io/input_handler.hpp"
 #include "high_level_io/output_handler.hpp"
+#include "i2c/SevenSegment.hpp"
 
 class ControlBoxEngine
 {
 public:
-  void initialize ();
-  void loop ();
+	void initialize ();
+	void loop ();
 private:
-  void listen_to_robot ();
-  Memory memory;
-  Communications communications;
-  InputHandler inputs;
-  OutputHandler outputs;
+	void listen_to_robot ();
+	Memory memory;
+	Communications communications;
+	InputHandler inputs;
+	OutputHandler outputs;
 };
 
 #endif // CONTROL_BOX_ENGINE_HPP

@@ -3,6 +3,7 @@
 #include <avr/interrupt.h>
 
 static volatile uint32_t count = 0;
+static volatile uint32_t GlobalCount = 0;
 static uint32_t max_count = 0;
 
 static void reset ()
@@ -14,20 +15,37 @@ static void reset ()
 
 ISR (TIMER1_OVF_vect)
 {
-  ++count;
-  if (count > max_count)
-	reset();
+
+	++count;
+	if (count > max_count)
+	{
+		GlobalCount+=4;
+		count = 0;
+		//reset();
+	}
+	TIFR1 = (0<<TOV1); //Reset timer0 overflow interrupt flag
 }
 
 SimpleTimer1::SimpleTimer1 ()
 {
-	reset();
+	start();
 }
+SimpleTimer1::SimpleTimer1(int l)
+{
+	reset();
+	set_duration(l);
+	start();
 
+}
+uint32_t SimpleTimer1::millis()
+{
+	return GlobalCount;
+}
 void SimpleTimer1::start ()
 {
 	TIMSK1 |= 0b00000001; // enable timer overflow interrupt
 	TCCR1B |= 0b00000001; // internal clock source, no prescale
+
 }
 
 void SimpleTimer1::restart ()

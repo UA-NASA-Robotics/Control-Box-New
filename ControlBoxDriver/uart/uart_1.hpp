@@ -6,7 +6,7 @@
 /*----------------------------- Set Buffer Sizes -----------------------------*/
 
 // size of receive and transmit buffers (must be power of 2)
-#define UART1_BUFFER_SIZE 32 
+#define UART1_BUFFER_SIZE 256
 
 /*----------------------------- Baud Rate Setup ------------------------------*/
 

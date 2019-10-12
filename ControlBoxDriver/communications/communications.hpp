@@ -7,60 +7,58 @@
 #include "parser.hpp"
 #include "../memory/memory.hpp"
 #include "../uart/uart_module.hpp"
-#include "../timer/SimpleTimer1.hpp"
 #include "request.hpp"
+#include "../timer/Clock.hpp"
 
 class Communications
 {
 public:
-  void initialize (UART_MODULE, Memory *);
-  void receive ();
-  void transmit ();
-  void read ();
-  void send (const Message &);
-  void send (const Message *, uint8_t);
-  uint8_t get_num_messages () const;
-  Message get_next_message ();
-private:
-  void initialize_uart ();
-  uint16_t read_byte ();
-  void send_byte (uint8_t);
-  uint8_t crc (const Message &);
-  //uint8_t crc (const Message *, uint8_t);
-  uint8_t crc (const Message [], uint8_t);
-  void parse (uint8_t);
+	// Initialization
+	void initialize (UART_MODULE, Memory *);
 
-  // methods to construct messages
-    void stop_all_msg (Message [], unsigned &);
-    void create_msg (Message [], unsigned &, uint8_t, int);
-    void estop_msg (Message [], unsigned &);
-    void bucket_up_msg (Message [], unsigned &);
-    void bucket_down_msg (Message [], unsigned &);
-    void arm_up_msg (Message [], unsigned &);
-    void arm_down_msg (Message [], unsigned &);
-    void plow_up_msg (Message [], unsigned &);
-    void plow_down_msg (Message [], unsigned &);
-    void joystick_msg (Message [], unsigned &);
-    void macro_msg (Message [], unsigned &, const Request &);
-  /*
-  void stop_all_msg (Message *, unsigned &);
-  void create_msg (Message *, unsigned &, uint8_t, int);
-  void estop_msg (Message *, unsigned &);
-  void bucket_up_msg (Message *, unsigned &);
-  void bucket_down_msg (Message *, unsigned &);
-  void arm_up_msg (Message *, unsigned &);
-  void arm_down_msg (Message *, unsigned &);
-  void plow_up_msg (Message *, unsigned &);
-  void plow_down_msg (Message *, unsigned &);
-  void joystick_msg (Message *, unsigned &);
-  void macro_msg (Message *, unsigned &, const Request &);
-  */
+	// Listening to the Robot
+	void receive ();
+	void read ();
+	uint8_t get_num_messages () const;
+	Message get_next_message ();
+	void check_connection ();
+
+	// Talking to the Robot
+	void transmit ();
+	bool is_emergency_stop_pressed ();
+	int is_macro_in_progress ();
+	bool is_macro_requested ();
+	void handle_emergency_stop();
+	void send_stop_macro ();
+	void ping_robot();
+	int8_t get_requested_macro ();
+	void handle_macro_request (uint8_t);
+	void handle_manual_command ();
+	void stop_all_motors ();
+	void send (const Message [], uint8_t);
+
+	// Construct messages
+	void get_arm_motor_command (Message [], uint8_t &);
+	void get_bucket_motor_command (Message [], uint8_t &);
+	void get_plow_motor_command (Message [], uint8_t &);
+	void joystickR_msg (Message [], uint8_t &);
+	void joystickL_msg (Message messages [], uint8_t & index);
 private:
-  UART_MODULE uart;
-  Memory * memory;
-  MessageQueue unread_messages;
-  FastTransferParser parser;
-  SimpleTimer1 timeout;
+
+	Memory * memory;
+	MessageQueue unread_messages;
+	FastTransferParser parser;
+	Clocks timeout;
+	void initialize_uart ();
+	uint16_t read_byte ();
+	void send_byte (uint8_t);
+	uint8_t crc (const Message [], uint8_t);
+	void parse (uint8_t);
+
+
+
+
+	long mapVal(long x, long in_min, long in_max, long out_min, long out_max);
 };
 
 #endif // COMMUNICATIONS_HPP

@@ -2,7 +2,8 @@
 #define UART_2_H
 
 #include <stdint-gcc.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 /*----------------------------- Set Buffer Sizes -----------------------------*/
 
 // size of receive and transmit buffers (must be power of 2)
@@ -100,5 +101,15 @@ void uart2_send_string (const char * str);
   // at time was transmitted to the UART2 module using interrupts.
   //
   //////////////////////////////////////////////////////////////////////////////
+#ifdef __cplusplus
+extern "C"{
+		// Needed for printf
+		int uart_putchar(char c, FILE *stream);
+
+		static FILE *mystdout;
+}
+#endif
+
+
 
 #endif // UART_2_H 
