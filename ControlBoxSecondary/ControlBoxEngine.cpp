@@ -5,6 +5,7 @@
 #include "uart/uart_2.hpp"
 void ControlBoxEngine::initialize ()
 {
+	// Enable Global Interrupts
 	sei();
 	uart2_initialize(UART2_BAUD_SELECT(115200UL, 16000000UL));  // For printf
 	memory.initialize();
@@ -20,10 +21,10 @@ void ControlBoxEngine::loop ()
 
 	while (1)
 	{
-		communications.check_connection();
+		communications.receive();
 		inputs.poll();
 		communications.transmit();
 		outputs.refresh();
-		communications.receive();
+
 	}
 }

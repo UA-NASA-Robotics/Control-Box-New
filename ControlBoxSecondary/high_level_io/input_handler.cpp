@@ -20,11 +20,11 @@ void InputHandler::initialize (Memory * memory)
 
 void InputHandler::poll ()
 {
-	if(PollInputs.isDone()) {
-		poll_arcade_buttons();
-		poll_push_buttons();
-		poll_analog_inputs();
-	}
+//  if(PollInputs.isDone()) {
+//    poll_arcade_buttons();
+//    poll_push_buttons();
+//    poll_analog_inputs();
+//  }
 }
 
 void InputHandler::clear_previous_inputs ()
