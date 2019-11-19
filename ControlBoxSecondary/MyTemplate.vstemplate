@@ -1,0 +1,98 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>ControlBoxDriver</Name>
+    <Description>&lt;No description available&gt;</Description>
+    <ProjectType>CandCPP</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>ControlBoxDriver</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="ControlBoxDriver.cppproj" File="ControlBoxDriver.cppproj" ReplaceParameters="true">
+      <Folder Name="libm" TargetFolderName="libm" />
+      <Folder Name="analog_input" TargetFolderName="analog_input">
+        <ProjectItem ReplaceParameters="true" TargetFileName="analog_input.cpp">analog_input.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="analog_input.hpp">analog_input.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="communications" TargetFolderName="communications">
+        <ProjectItem ReplaceParameters="true" TargetFileName="communications.cpp">communications.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="communications.hpp">communications.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="message.hpp">message.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="message_queue.cpp">message_queue.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="message_queue.hpp">message_queue.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="parser.cpp">parser.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="parser.hpp">parser.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="request.cpp">request.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="request.hpp">request.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="robot_addresses.hpp">robot_addresses.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="digital_io" TargetFolderName="digital_io">
+        <ProjectItem ReplaceParameters="true" TargetFileName="digital_io_params.hpp">digital_io_params.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="digital_pin.cpp">digital_pin.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="digital_pin.hpp">digital_pin.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="expander.cpp">expander.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="expander.hpp">expander.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="expander_pin.cpp">expander_pin.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="expander_pin.hpp">expander_pin.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="high_level_io" TargetFolderName="high_level_io">
+        <ProjectItem ReplaceParameters="true" TargetFileName="input_handler.cpp">input_handler.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="input_handler.hpp">input_handler.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="output_handler.cpp">output_handler.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="output_handler.hpp">output_handler.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="i2c" TargetFolderName="i2c">
+        <ProjectItem ReplaceParameters="true" TargetFileName="i2c.cpp">i2c.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="i2c.hpp">i2c.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="I2CIO.cpp">I2CIO.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="I2CIO.hpp">I2CIO.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="LCD.cpp">LCD.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="LCD.hpp">LCD.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="LiquidCrystal_I2C.cpp">LiquidCrystal_I2C.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="LiquidCrystal_I2C.hpp">LiquidCrystal_I2C.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SevenSegment.cpp">SevenSegment.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SevenSegment.hpp">SevenSegment.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="memory" TargetFolderName="memory">
+        <ProjectItem ReplaceParameters="true" TargetFileName="memory.cpp">memory.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="memory.hpp">memory.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="memory_variables.hpp">memory_variables.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="screen" TargetFolderName="screen">
+        <ProjectItem ReplaceParameters="true" TargetFileName="screen_objects.hpp">screen_objects.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="touch_screen.cpp">touch_screen.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="touch_screen.hpp">touch_screen.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="timer" TargetFolderName="timer">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Clock.cpp">Clock.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Clock.hpp">Clock.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SimpleTimer0.cpp">SimpleTimer0.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SimpleTimer0.hpp">SimpleTimer0.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SimpleTimer1.cpp">SimpleTimer1.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SimpleTimer1.hpp">SimpleTimer1.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="timer.cpp">timer.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="timer.hpp">timer.hpp</ProjectItem>
+      </Folder>
+      <Folder Name="uart" TargetFolderName="uart">
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_0.cpp">uart_0.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_0.hpp">uart_0.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_1.cpp">uart_1.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_1.hpp">uart_1.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_2.cpp">uart_2.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_2.hpp">uart_2.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_3.cpp">uart_3.cpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_3.hpp">uart_3.hpp</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="uart_module.hpp">uart_module.hpp</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ControlBoxEngine.cpp">ControlBoxEngine.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ControlBoxEngine.hpp">ControlBoxEngine.hpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="main.cpp">main.cpp</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>
