@@ -59,8 +59,9 @@ void Communications::receive ()
 			}
 			memory->write(msg.address, data);
 		}
-		//if We get a stop macro clear the buttons
+		// Reseting the timeout Timer
 		ROBOT_CONNECTED_TIMEOUT.reset();
+		// We Received something so we can assume we are connected
 		memory->write(CONNECTED, true);
 	}
 

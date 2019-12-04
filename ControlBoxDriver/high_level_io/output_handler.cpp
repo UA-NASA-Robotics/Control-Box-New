@@ -64,7 +64,13 @@ void OutputHandler::refresh ()
 	// update the up-time
 	LsevenSeg.print(memory->read(CONNECTED_TIME_ELAP), DEC);
 	LsevenSeg.writeDisplay();
-
+	lcd.setCursor(0, 2);
+	lcd.print("UpTime: ");
+	char numChar[5];
+	sprintf(numChar,"%d",memory->read(CONNECTED_TIME_ELAP));
+	lcd.print("     ");
+	lcd.setCursor(8, 2);
+	lcd.print(numChar);
 	// update the force sensor feedback
 	uint16_t force_measurement = memory->read(FORCE_SENSOR_FEEDBACK);
 	RsevenSeg.print(force_measurement, DEC);
