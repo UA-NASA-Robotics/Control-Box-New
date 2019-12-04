@@ -54,12 +54,14 @@ void Communications::receive ()
 		uint16_t data = (uint16_t)msg.first + ((uint16_t)msg.second << 8);
 		if (memory->valid_address(msg.address)) {
 			if(msg.address == MACRO_TYPE && data == 0 ) {
+				// Clearing the LED on macro button
 				memory->write(memory->read(MACRO_TYPE) -1 + PUSH_BUTTON_0_FLAG, 0);
 			}
 			memory->write(msg.address, data);
 		}
 		//if We get a stop macro clear the buttons
-
+		ROBOT_CONNECTED_TIMEOUT.reset();
+		memory->write(CONNECTED, true);
 	}
 
 }
@@ -86,18 +88,10 @@ Message Communications::get_next_message ()
 
 void Communications::check_connection ()
 {
-	memory->write(CONNECTED, memory->read(MESSAGE_SENDER));
-	memory->write(MESSAGE_SENDER, 0);
-
-	if(memory->read(CONNECTED))
-	{
-		if(CONNECTED_TIME.isDoneSpecial())
-			memory->write(CONNECTED_TIME_ELAP, memory->read(CONNECTED_TIME_ELAP) + 1);
-		ROBOT_CONNECTED_TIMEOUT.reset();
-	}
 	if(ROBOT_CONNECTED_TIMEOUT.isDone_NoReset() ) {
 		CONNECTED_TIME.reset();
 		memory->write(CONNECTED_TIME_ELAP,0);
+		memory->write(CONNECTED, false);
 	}
 }
 
@@ -106,28 +100,16 @@ static Clocks TransmitPeriodTimer(100);
 bool E_StopPressed = false;
 void Communications::transmit ()
 {
+
 	receive();
-	ping_robot();
-	if (is_emergency_stop_pressed() || E_StopPressed)
+	if (is_emergency_stop_pressed())
 	{
-
 		handle_emergency_stop();
-		if(memory->read(MACRO_TYPE) != 0) {
-			E_StopPressed = true;
-			return;
-		} else {
-			for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i)
-			{
-				memory->write(PUSH_BUTTON_0_FLAG + i, 0);
-			}
-			E_StopPressed = false;
-		}
-
+		return;
 	}
 
 	if (is_macro_in_progress())
 	{
-
 		return; // Don't do anything.
 	}
 	else
@@ -202,20 +184,21 @@ void Communications::send_stop_macro ()
 	} while (memory->read(MACRO_TYPE) != 0 && !timeout.isDone());    //This is to ensure the that robot is out of the macro
 }
 
-void Communications::ping_robot ()
-{
-	if(ROBOT_PING_TIMER.isDone())
-	{
-		//ping
-		Message message [0];
-		message[0] = {MESSAGE_SENDER, CONTROL_BOX_ADDRESS, 0};
-		send(message, 1);
-	}
-
-}
+// void Communications::ping_robot ()
+// {
+//  if(ROBOT_PING_TIMER.isDone())
+//  {
+//    //ping
+//    Message message [0];
+//    message[0] = {MESSAGE_SENDER, CONTROL_BOX_ADDRESS, 0};
+//    send(message, 1);
+//  }
+//
+// }
 
 int8_t Communications::get_requested_macro ()
 {
+	// polling all the macro buttons and returning the one the has been pressed
 	uint8_t macro = -1;
 	for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
 		if (memory->read(PUSH_BUTTON_0_FLAG + i))

@@ -5,14 +5,14 @@
 
 // Variables for Communications
 #define ROUTER_ADDRESS    0x00
-#define MACRO_TYPE      0x01
+#define CONNECTED_TIME_ELAP      0x01
 #define MACRO_DATA      0x02
 #define REQUEST       0x03
 #define CONNECTED     0x04
 #define TIMEOUT_IN_PROGRESS 0x07
-#define TRANSMIT_MACRO    0x08
+#define MACRO_TYPE    0x08
 #define MACRO_IN_PROGRESS 0x09
-#define CONNECTED_TIME_ELAP 0x0A
+
 
 /*--------------------------------- Page Two ---------------------------------*/
 

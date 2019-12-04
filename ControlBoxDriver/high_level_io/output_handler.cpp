@@ -119,8 +119,11 @@ void OutputHandler::refresh_push_button_leds ()
 {
 	for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i)
 	{
-		if (memory->read(PUSH_BUTTON_0_FLAG+i) ) { //memory->read(MACRO_TYPE) - 1 == i) {
-			if(memory->read(MACRO_TYPE))
+		// Has the button been pushed
+		if (memory->read(PUSH_BUTTON_0_FLAG+i) ) {
+			// Led is solid if the corresponding macro is true
+			// otherwise blink the button LED
+			if(memory->read(MACRO_TYPE) & (1 << i))
 			{
 				push_button_leds[i].write(1);
 			} else {
