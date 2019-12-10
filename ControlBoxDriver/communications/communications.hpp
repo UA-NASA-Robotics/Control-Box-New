@@ -26,7 +26,7 @@ public:
 	// Talking to the Robot
 	void transmit ();
 	bool is_emergency_stop_pressed ();
-	int is_macro_in_progress ();
+	uint16_t is_macro_in_progress ();
 	bool is_macro_requested ();
 	void handle_emergency_stop();
 	void send_stop_macro ();

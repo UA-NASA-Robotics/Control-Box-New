@@ -57,9 +57,11 @@ void Communications::receive ()
 
 			memory->write(msg.address, data);
 			// Stop Macro request
-			if(msg.address == MACRO_TYPE && data == 0 && lastMacro !=0) {
-				for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
-					memory->write(PUSH_BUTTON_0_FLAG + i,0);
+			//TODO: move this to a proper location and make it so that it doesn't clear all flags but just the ones needed
+			if(msg.address == MACRO_TYPE  && lastMacro !=0) {
+				for (uint16_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
+					if((data & (1<<(i))) ==0)
+						memory->write(PUSH_BUTTON_0_FLAG + i, 0);
 
 				}
 			}
@@ -131,13 +133,26 @@ void Communications::transmit ()
 		//return;
 	}
 	uint16_t requestedMacro = get_requested_macro();
-	if (requestedMacro != 0 && !memory->read(ARCADE_E_STOP_FLAG))//&& requestedMacro != is_macro_in_progress())
-	{
-		//Trying to Send Macro: get_requested_macro();
-		if(MACRO_RE_SEND_TIMER.isDone()) {
+	printf("R:%d\n",requestedMacro);
+	printf("P:%d\n",is_macro_in_progress());
+//Trying to Send Macro: get_requested_macro();
+	if(MACRO_RE_SEND_TIMER.isDone()) {
+		if ((requestedMacro != 0 && !memory->read(ARCADE_E_STOP_FLAG)) | is_macro_in_progress())
+		{
 
-			handle_macro_request(get_requested_macro());
-			//SendingMacro
+			// if the macro requested is different then the won
+			if(((requestedMacro & is_macro_in_progress()) == 0)&& requestedMacro != 0 ) {
+
+				handle_macro_request(get_requested_macro());
+			} else {
+				Message message [1];
+				message[0] = {0, 0, 0};
+				timeout.reset();
+
+				send(message, 1);
+				receive();
+			}
+
 		}
 	}
 
@@ -148,7 +163,7 @@ bool Communications::is_emergency_stop_pressed ()
 	return memory->read(ARCADE_BUTTON_0_FLAG);
 }
 
-int Communications::is_macro_in_progress ()
+uint16_t Communications::is_macro_in_progress ()
 {
 	return memory->read(MACRO_TYPE);
 }

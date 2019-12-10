@@ -379,7 +379,6 @@ void LCD::print(const char *str)
 {
 	while(*str != 0x00)
 	{
-		printf("PrintVal: %d\n",str);
 		write(*(str++));
 
 	}
