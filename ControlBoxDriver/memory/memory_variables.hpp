@@ -38,6 +38,7 @@
 #define ARCADE_BUTTON_6_FLAG 0x36 // Arm Down
 #define ARCADE_BUTTON_7_FLAG 0x37 // Plow Up
 #define ARCADE_BUTTON_8_FLAG 0x38 // Plow Down
+#define ARCADE_E_STOP_FLAG   0x39
 
 /*-------------------------------- Page Four ---------------------------------*/
 

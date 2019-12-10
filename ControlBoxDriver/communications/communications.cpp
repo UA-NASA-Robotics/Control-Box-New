@@ -52,12 +52,17 @@ void Communications::receive ()
 
 		Message msg = get_next_message();
 		uint16_t data = (uint16_t)msg.first + ((uint16_t)msg.second << 8);
+		uint16_t lastMacro = memory->read(MACRO_TYPE);
 		if (memory->valid_address(msg.address)) {
-			if(msg.address == MACRO_TYPE && data == 0 ) {
-				// Clearing the LED on macro button
-				memory->write(memory->read(MACRO_TYPE) -1 + PUSH_BUTTON_0_FLAG, 0);
-			}
+
 			memory->write(msg.address, data);
+			// Stop Macro request
+			if(msg.address == MACRO_TYPE && data == 0 && lastMacro !=0) {
+				for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
+					memory->write(PUSH_BUTTON_0_FLAG + i,0);
+
+				}
+			}
 		}
 		// Reseting the timeout Timer
 		ROBOT_CONNECTED_TIMEOUT.reset();
@@ -105,24 +110,28 @@ void Communications::transmit ()
 	receive();
 	if (is_emergency_stop_pressed())
 	{
+		memory->write(ARCADE_E_STOP_FLAG,true);
 		handle_emergency_stop();
 		return;
 	}
 
-	if (is_macro_in_progress())
+
+	if (!is_macro_in_progress())
 	{
-		return; // Don't do anything.
-	}
-	else
-	{
+		memory->write(ARCADE_E_STOP_FLAG,false);
+
 		if(TransmitPeriodTimer.isDone())
 		{
 			//send_stop_macro(); // Just in case, write 0 to macro.
 			handle_manual_command();
 		}
 	}
-	int requestedMacro = get_requested_macro();
-	if (requestedMacro != -1 && requestedMacro != is_macro_in_progress())
+	if(memory->read(ARCADE_E_STOP_FLAG)==true) {
+		handle_emergency_stop();
+		//return;
+	}
+	uint16_t requestedMacro = get_requested_macro();
+	if (requestedMacro != 0 && !memory->read(ARCADE_E_STOP_FLAG))//&& requestedMacro != is_macro_in_progress())
 	{
 		//Trying to Send Macro: get_requested_macro();
 		if(MACRO_RE_SEND_TIMER.isDone()) {
@@ -162,12 +171,15 @@ void Communications::handle_emergency_stop ()
 	message[4] = {PLOW_SPEED_DIRECTION, 0, 0};
 	message[5] = {MACRO_COMMAND, 0, 0};
 	message[6] = {MACRO_ARGUMENT, 0, 0};
+	for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
+		memory->write(PUSH_BUTTON_0_FLAG + i,0);
+	}
+	do
+	{
+		send(message, 7);
+		receive();
+	} while (memory->read(MACRO_TYPE) != 0 && !timeout.isDone());
 
-	//do
-	//{
-	send(message, 7);
-	receive();
-	//} while (memory->read(MACRO_TYPE) != 0 && !timeout.isDone());
 //  if(memory->read(MACRO_TYPE) != 0)
 //    printf("TimeOut\r\n");
 }
@@ -178,11 +190,11 @@ void Communications::send_stop_macro ()
 	message[0] = {MACRO_COMMAND, 0, 0};
 	message[1] = {MACRO_ARGUMENT, 0, 0};
 	timeout.reset();
-	do
-	{
-		send(message, 2);
-		receive();
-	} while (memory->read(MACRO_TYPE) != 0 && !timeout.isDone());    //This is to ensure the that robot is out of the macro
+	//do
+	//{
+	send(message, 2);
+	receive();
+	//} while (memory->read(MACRO_TYPE) != 0 && !timeout.isDone());    //This is to ensure the that robot is out of the macro
 }
 
 // void Communications::ping_robot ()
@@ -197,21 +209,21 @@ void Communications::send_stop_macro ()
 //
 // }
 
-int8_t Communications::get_requested_macro ()
+int16_t Communications::get_requested_macro ()
 {
 	// polling all the macro buttons and returning the one the has been pressed
-	uint8_t macro = -1;
+	uint16_t macro = 0;
 	for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
 		if (memory->read(PUSH_BUTTON_0_FLAG + i))
-			return i+1;//macro = i + 1;
+			macro |=  (1<<i);//macro = i + 1;
 	}
 	return macro;
 }
 
-void Communications::handle_macro_request (uint8_t macro)
+void Communications::handle_macro_request (uint16_t macro)
 {
 	Message message [2];
-	message[0] = {MACRO_COMMAND, macro, 0};
+	message[0] = {MACRO_COMMAND, ((macro)), ((macro))>>8};
 	message[1] = {MACRO_ARGUMENT, 0, 0};
 	timeout.reset();
 	//do

@@ -129,7 +129,7 @@ void OutputHandler::refresh_push_button_leds ()
 		if (memory->read(PUSH_BUTTON_0_FLAG+i) ) {
 			// Led is solid if the corresponding macro is true
 			// otherwise blink the button LED
-			if(memory->read(MACRO_TYPE) & (1 << i))
+			if((memory->read(MACRO_TYPE) & (1 << i)) !=0)
 			{
 				push_button_leds[i].write(1);
 			} else {
