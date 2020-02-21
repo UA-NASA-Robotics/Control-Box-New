@@ -33,8 +33,10 @@
 
 void copy_range (uint8_t * src, uint8_t * dest, uint8_t size)
 {
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size; ++i) {
 		*dest++ = *src++;
+		printf("copy%d: %d\n",i,*dest);
+	}
 }
 
 bool interrupt_flag_set ()
@@ -75,6 +77,7 @@ when VERIFY_ADDRESS:
 			verify_write_address_sent();
 when SEND_BYTE:
 			send_data_byte(data[index]);
+
 when VERIFY_DATA:
 			verify_data_sent();
 when STOP:

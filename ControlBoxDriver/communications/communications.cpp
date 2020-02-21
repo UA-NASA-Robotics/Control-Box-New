@@ -35,7 +35,7 @@ void Communications::initialize (UART_MODULE uart, Memory * memory)
 	//uart = UART_1;
 	this->memory = memory;
 	initialize_uart();
-	MACRO_RE_SEND_TIMER.setInterval(100);
+	MACRO_RE_SEND_TIMER.setInterval(200);
 	ROBOT_PING_TIMER.setInterval(300);
 	ROBOT_CONNECTED_TIMEOUT.setInterval(2000);
 	CONNECTED_TIME.setInterval(1010);
@@ -104,7 +104,7 @@ void Communications::check_connection ()
 }
 
 // Talking to the Robot
-static Clocks TransmitPeriodTimer(100);
+static Clocks TransmitPeriodTimer(50);
 bool E_StopPressed = false;
 void Communications::transmit ()
 {
@@ -133,8 +133,6 @@ void Communications::transmit ()
 		//return;
 	}
 	uint16_t requestedMacro = get_requested_macro();
-	printf("R:%d\n",requestedMacro);
-	printf("P:%d\n",is_macro_in_progress());
 //Trying to Send Macro: get_requested_macro();
 	if(MACRO_RE_SEND_TIMER.isDone()) {
 		if ((requestedMacro != 0 && !memory->read(ARCADE_E_STOP_FLAG)) | is_macro_in_progress())
@@ -179,13 +177,12 @@ bool Communications::is_macro_requested ()
 void Communications::handle_emergency_stop ()
 {
 	Message message [7];
-	message[0] = {LEFT_MOTOR_SPEED, 0, 0};
-	message[1] = {RIGHT_MOTOR_SPEED, 0, 0};
-	message[2] = {ARM_MOTOR_SPEED, 0, 0};
-	message[3] = {BUCKET_ACTUATOR_SPEED, 0, 0};
-	message[4] = {PLOW_SPEED_DIRECTION, 0, 0};
-	message[5] = {MACRO_COMMAND, 0, 0};
-	message[6] = {MACRO_ARGUMENT, 0, 0};
+	message[0] = {DRIVE_MOTOR_SPEED, 0, 0};
+	message[1] = {ARM_MOTOR_SPEED, 0, 0};
+	message[2] = {BUCKET_ACTUATOR_SPEED, 0, 0};
+	message[3] = {PLOW_SPEED_DIRECTION, 0, 0};
+	message[4] = {MACRO_COMMAND, 0, 0};
+	message[5] = {MACRO_ARGUMENT, 0, 0};
 	for (uint8_t i = 0; i < NUM_PUSH_BUTTONS; ++i) {
 		memory->write(PUSH_BUTTON_0_FLAG + i,0);
 	}
@@ -197,7 +194,9 @@ void Communications::handle_emergency_stop ()
 
 //  if(memory->read(MACRO_TYPE) != 0)
 //    printf("TimeOut\r\n");
-}
+}//  printf("R:%d\n",requestedMacro);
+//  printf("P:%d\n",is_macro_in_progress());
+
 
 void Communications::send_stop_macro ()
 {
@@ -238,8 +237,13 @@ int16_t Communications::get_requested_macro ()
 void Communications::handle_macro_request (uint16_t macro)
 {
 	Message message [2];
+	uint16_t data = 0;
 	message[0] = {MACRO_COMMAND, ((macro)), ((macro))>>8};
-	message[1] = {MACRO_ARGUMENT, 0, 0};
+	if((macro &( 1 << 10)))
+		data = 100;
+	if((macro &( 1 << 8)))
+		data = 90;
+	message[1] = {MACRO_ARGUMENT, data, data >> 8};
 	timeout.reset();
 	//do
 	//{
@@ -250,22 +254,22 @@ void Communications::handle_macro_request (uint16_t macro)
 
 void Communications::handle_manual_command ()
 {
-	Message messages [5];
+	Message messages [4];
 	uint8_t index = 0;
 	joystickR_msg(messages, index);
 	joystickL_msg(messages, index);
 	//get_arm_motor_command(messages, index);
 	get_bucket_motor_command(messages, index);
 	get_plow_motor_command(messages, index);
-	send(messages, 5);
+	send(messages, 4);
 }
 
 void Communications::stop_all_motors ()
 {
-	Message messages [5] =
+	Message messages [4] =
 	{
-		Message {LEFT_MOTOR_SPEED, 0, 0},
-		Message {RIGHT_MOTOR_SPEED, 0, 0},
+		//Message {LEFT_MOTOR_SPEED, 0, 0},
+		Message {DRIVE_MOTOR_SPEED, 0, 0},
 		Message {ARM_MOTOR_SPEED, 0, 0},
 		Message {BUCKET_ACTUATOR_SPEED, 0, 0},
 		Message {PLOW_SPEED_DIRECTION, 0, 0}
@@ -353,24 +357,25 @@ void Communications::joystickR_msg (Message messages [], uint8_t & index)
 
 	leftSpeed  = mapVal(leftSpeed, min_speed, max_speed, -slider,slider);
 	rightSpeed = mapVal(rightSpeed, min_speed, max_speed, -slider,slider);
-
+	if(abs(leftSpeed) < 8)
+		leftSpeed = 0;
+	if(abs(rightSpeed) < 8)
+		rightSpeed = 0;
 	/* Converting to two's Comp */
 	uint16_t left_speed = leftSpeed < 0 ? ~(uint16_t)(abs(leftSpeed)) + 1 : (uint16_t)leftSpeed;
 	uint16_t right_speed = rightSpeed < 0 ? ~(uint16_t)(abs(rightSpeed)) + 1 : (uint16_t)rightSpeed;
-//  if(abs(right_speed) > 15 || abs(left_speed) > 15)
-//  {
-	//printf("RightSpeed: %d\nLeftSpeed: %d\n",right_speed,left_speed);
-//  }
-//  printf("RightSpeed: %d\nLeftSpeed: %d\n",right_speed,left_speed);
 
-	messages[index].address = LEFT_MOTOR_SPEED;
-	messages[index].first = left_speed;
-	messages[index].second = left_speed >> 8;
+	//printf("RightSpeed: %d\nLeftSpeed: %d\n",right_speed,left_speed);
+
+// Right and Left speed should be bounded by [-100, 100] so the they can fit in an 8 bit value
+	messages[index].address = DRIVE_MOTOR_SPEED;
+	messages[index].first = left_speed & 0xFF;
+	messages[index].second = right_speed & 0xFF;
 	++index;
-	messages[index].address = RIGHT_MOTOR_SPEED;
-	messages[index].first = right_speed;
-	messages[index].second = right_speed >> 8;
-	++index;
+//  messages[index].address = RIGHT_MOTOR_SPEED;
+//  messages[index].first = right_speed;
+//  messages[index].second = right_speed >> 8;
+//  ++index;
 }
 void Communications::joystickL_msg (Message messages [], uint8_t & index)
 {

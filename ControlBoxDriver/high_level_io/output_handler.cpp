@@ -13,14 +13,14 @@
 Adafruit_7segment LsevenSeg(0x70);
 Adafruit_7segment RsevenSeg(0x71);
 LiquidCrystal_I2C lcd(0x3F, 2, 1, 0, 4, 5, 6, 7);
-
+Clocks UpdateTimer;
 void OutputHandler::initialize (Memory * memory)
 {
 	this->memory = memory;
 	initialize_expanders();
 	initialize_push_button_leds();
 	initialize_panel_leds();
-
+	UpdateTimer.setInterval(200);
 	screen.initialize(memory, UART_3);
 
 	lcd.begin (20, 4); // 20 x 4 LCD module
@@ -60,21 +60,23 @@ void OutputHandler::refresh ()
 
 	// update the touchscreen
 	screen.refresh();
+	if(UpdateTimer.isDone()) {
+		// update the up-time
+		LsevenSeg.print(memory->read(CONNECTED_TIME_ELAP), DEC);
+		LsevenSeg.writeDisplay();
 
-	// update the up-time
-	LsevenSeg.print(memory->read(CONNECTED_TIME_ELAP), DEC);
-	LsevenSeg.writeDisplay();
-	lcd.setCursor(0, 2);
-	lcd.print("UpTime: ");
-	char numChar[5];
-	sprintf(numChar,"%d",memory->read(CONNECTED_TIME_ELAP));
-	lcd.print("     ");
-	lcd.setCursor(8, 2);
-	lcd.print(numChar);
-	// update the force sensor feedback
-	uint16_t force_measurement = memory->read(FORCE_SENSOR_FEEDBACK);
-	RsevenSeg.print(force_measurement, DEC);
-	RsevenSeg.writeDisplay();
+		lcd.setCursor(0, 2);
+		lcd.print("UpTime: ");
+		char numChar[5];
+		sprintf(numChar,"%d",memory->read(CONNECTED_TIME_ELAP));
+		lcd.print("     ");
+		lcd.setCursor(8, 2);
+		lcd.print(numChar);
+		// update the force sensor feedback
+		uint16_t force_measurement = memory->read(FORCE_SENSOR_FEEDBACK);
+		RsevenSeg.print(420);
+		RsevenSeg.writeDisplay();
+	}
 }
 
 void OutputHandler::initialize_expanders ()

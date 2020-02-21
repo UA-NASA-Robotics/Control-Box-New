@@ -25,6 +25,7 @@ static volatile uint8_t transmit_tail;
 static volatile uint8_t receive_buffer [UART3_BUFFER_SIZE];
 static volatile uint8_t receive_head;
 static volatile uint8_t receive_tail;
+static volatile uint8_t receive_count = 0;
 
 // Most Recent Receive Error
 static volatile uint8_t last_receive_error;
@@ -48,6 +49,8 @@ ISR (UART3_RECEIVE_INTERRUPT)
 		receive_head = new_head;
 		receive_buffer[new_head] = data;
 	}
+	if(receive_count < UART3_BUFFER_SIZE -1)
+		receive_count++;
 	last_receive_error |= error;
 }
 
@@ -64,6 +67,7 @@ ISR (UART3_TRANSMIT_INTERRUPT)
 		UART3_CONTROL_B &= ~(1 << UDRIE3); // buffer empty so end transmission
 }
 
+
 /*------------------------------ Initialization ------------------------------*/
 
 void uart3_initialize (uint16_t baudrate)
@@ -72,6 +76,8 @@ void uart3_initialize (uint16_t baudrate)
 	transmit_tail = 0;
 	receive_head = 0;
 	receive_tail = 0;
+	receive_count = 0;
+
 
 	UBRR3H = (uint8_t)((baudrate >> 8) & 0x80) ;
 	UBRR3L = (uint8_t)(baudrate & 0x00FF);
@@ -84,7 +90,16 @@ void uart3_initialize (uint16_t baudrate)
 }
 
 /*-------------------- Functions for Reading from Buffer ---------------------*/
-
+void uart3_Buffer_Rx_Clear()
+{
+	receive_tail = 0;
+	receive_head = 0;
+	receive_count = 0;
+}
+uint8_t uart3_ReceiveAvailable()
+{
+	return receive_count;
+}
 uint16_t uart3_read_byte ()
 {
 	uint8_t new_tail;
@@ -94,7 +109,12 @@ uint16_t uart3_read_byte ()
 		return UART3_NO_DATA;
 	new_tail = (receive_tail + 1) & UART3_BUFFER_MASK;
 	data = receive_buffer[new_tail];
+//  printf("tail: %d\n",new_tail);
+//  for(int i = 0; i < UART3_BUFFER_SIZE -1; i++)
+//    printf("Data%d: %d\n",i,receive_buffer[i]);
 	receive_tail = new_tail;
+	if(receive_count !=0)
+		receive_count--;
 	error = last_receive_error;
 	last_receive_error = 0;
 	return (error << 8) + data;
